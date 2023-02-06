@@ -9,6 +9,7 @@ Created on Tue May 24 21:19:19 2022
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+import os
 from matplotlib.pyplot import cm # used to generate a sequence of colours for plotting
 from scipy.optimize import curve_fit
 from IPython.display import HTML as html_print
@@ -1047,10 +1048,10 @@ def HistOverlap(dataArray, nbins = 10, xlabel = 'x-axis', xUnits = '',  normaliz
 
 ###############################################################################
 # Import Image & Add a Caption                                                #
-# - modified 20220711                                                         #
+# - modified 20230205                                                         #
 ###############################################################################        
 # Start the 'Import Image' function.
-def ImportImage(filename, caption = '', size = 5, rotation = 0):
+def ImportImage(filename, caption = '', rotation = 0):
     from os.path import exists as file_exists
     fig = ''
     if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.eps')) == False:
@@ -1065,14 +1066,14 @@ def ImportImage(filename, caption = '', size = 5, rotation = 0):
         display(html_print(cstr('The rotational angle must be a float or integer.  It represents the rotation angle in degrees.', color = 'magenta')))
     else:
         from PIL import Image
-        fig = plt.figure(figsize=(size, size), dpi=100) # create a square figure.
+        fig = plt.figure(figsize=(12, 8), dpi=100) # create a square figure.
         img = Image.open(filename) # Open the file
         img = img.rotate(rotation, expand = 1) # Rotate the file.
         plt.imshow(img)
         plt.axis('off') # Remove the axes from the 'plot'.
-        plt.text(0, 4300,'%s' %caption, size = 14, color = "k") # Add the caption below the image.
+        plt.text(0, 0,'%s' %caption, size = 14, color = "k") # Add the caption below the image.
         plt.show() # Show the image.
-    return fig
+    return
     
     
 ###############################################################################
@@ -1093,10 +1094,10 @@ def Spreadsheet(csvName):
 
 ###############################################################################
 # Produce contour and vector field plots                                      #
-# - modified 20220816                                                         #
+# - modified 20230205                                                         #
 ###############################################################################       
 # Check to see if ipysheet is installed.
-def Mapping(x_coord, y_coord, potential, graphNum = 0, vectorField = True):
+def Mapping(x_coord, y_coord, potential, graphNum = 0, vectorField = True, fig_file_name = 'figure.png'):
     
     import matplotlib.pyplot as plt
     import scipy.interpolate
@@ -1122,6 +1123,8 @@ def Mapping(x_coord, y_coord, potential, graphNum = 0, vectorField = True):
         display(html_print(cstr("The elements of 'potential' must be integers or floats.", color = 'magenta')))
     elif isinstance(graphNum, int) == False:
         display(html_print(cstr("'graphNum' must be an integer from 1 to 7 corresponding to the graph number on your board.", color = 'magenta')))
+    elif isinstance(fig_file_name, str) == False:
+        display(html_print(cstr("'fig_file_name' must be a string.", color = 'magenta')))
     else:
         
         x = x_coord
@@ -1293,8 +1296,9 @@ def Mapping(x_coord, y_coord, potential, graphNum = 0, vectorField = True):
         
                 # Plot the electric field vectors.
                 plt.quiver(x_E, y_E, ExSub, EySub, scale = Sc, scale_units = 'inches', width = 0.0035, color = 'k')
+                plt.savefig(fig_file_name, format='png')
 
-    return fig
+    return
 
 ###############################################################################
 # Generate a sequence of random integers and then find their product          #
@@ -1335,3 +1339,15 @@ def chase(Number):
     if Number != 9: # Find the suppressed digit
         Number = 9 - Number
     return Number
+
+
+###############################################################################
+# Change the extension of a string representing the name of a file            #
+# - modified 20230205                                                         #
+###############################################################################       
+def extension(file_names_in, new_ext):
+    file_names_out = []
+    for f in file_names_in:
+        file_name, file_extension = os.path.splitext(f)
+        file_names_out.append(file_name + "." + new_ext)
+    return file_names_in + file_names_out
