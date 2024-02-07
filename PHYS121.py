@@ -97,12 +97,17 @@ def Installer():
     import sys
     import subprocess
     cnt = 0
+    #package_names = ['uncertainties', 'pdfkit', 'PyPDF2', 'otter']
     package_names = ['uncertainties', 'pdfkit', 'PyPDF2']
     for name in package_names:
         spec = importlib.util.find_spec(name)
         if spec is None:
             display(html_print(cstr('Installing some packages ...\n', color = 'red')))
             display(html_print(cstr("After the installation completes, please run the 'PHYS121.Installer()' function again before proceeding.\n", color = 'red')))
+            #if name == 'otter':
+            #    subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--user', 'otter-grader'])
+            #else:
+            #    subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--user', name])
             subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--user', name])
             cnt += 1
 
@@ -117,7 +122,7 @@ def Installer():
         cnt += 1
     finally:
         globals()['otter'] = importlib.import_module('otter')
-    
+     
     if cnt == 0:
         display(html_print(cstr('All packages already installed. Please proceed.', color = 'black')))
     else:
@@ -1246,7 +1251,7 @@ def Mapping(x_coord, y_coord, potential, graphNum = 0, vectorField = True, fig_f
     from matplotlib.pyplot import figure
     from scipy import interpolate
     from IPython.display import HTML as html_print
-    from scipy.interpolate import interp1d
+    from scipy.interpolate import interp1d, RectBivariateSpline
 
     fig = ''
     
@@ -1304,12 +1309,14 @@ def Mapping(x_coord, y_coord, potential, graphNum = 0, vectorField = True, fig_f
             xx, yy = np.meshgrid(xi, yi)
             Z = np.zeros(np.shape(xx))
 
-            f = interpolate.interp2d(xi, yi, zi, kind='cubic')
+            #f = interpolate.interp2d(xi, yi, zi, kind='cubic') # Decapricated
+            r = RectBivariateSpline(xi, yi, zi.T)
 
             xnew = np.arange(0, 25.025, 0.025)
             ynew = np.arange(0, 20.025, 0.025)
-            znew = f(xnew, ynew)
-
+            #znew = f(xnew, ynew)
+            znew = r(xnew, ynew).T
+            
             if graphNum == 6:
                 btm = -1
             else:
